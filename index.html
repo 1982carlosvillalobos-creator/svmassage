@@ -48,12 +48,13 @@
 
         h1, h2, h3, .logo-text, .price-amount, .playfair { font-family: 'Playfair Display', serif; }
         
-        /* BARRA DE IDIOMAS Y TRADUCTOR */
+        /* BARRA DE IDIOMAS Y TRADUCTOR CORREGIDA */
         #language-bar { 
             background: #ffffff; border-bottom: 1px solid rgba(90, 138, 99, 0.1); 
             padding: 8px 20px; display: flex; justify-content: space-between; 
-            align-items: center; font-size: 0.85rem; flex-wrap: wrap; gap: 10px;
+            align-items: center; 
         }
+        #language-bar span { font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); white-space: nowrap; }
         .goog-te-banner-frame.skiptranslate { display: none !important; } 
         #google_translate_element .goog-te-gadget-simple { 
             background-color: var(--bg-light); border: 1px solid rgba(90, 138, 99, 0.2); 
@@ -79,7 +80,15 @@
         .container { max-width: 1150px; margin: 0 auto; padding: 0 20px; }
         .header-content { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
         
-        .logo { display: flex; align-items: center; gap: 10px; font-size: 1.8rem; font-weight: 700; color: var(--primary-dark); text-decoration: none; }
+        /* LOGO CORREGIDO PARA SER CÍRCULO PERFECTO */
+        .logo { display: flex; align-items: center; text-decoration: none; }
+        .logo img { 
+            height: 60px; 
+            width: 60px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            box-shadow: 0 4px 10px rgba(44, 76, 59, 0.15); 
+        }
         
         .nav-menu { display: flex; gap: 1.5rem; align-items: center; }
         .nav-menu a { color: var(--text-dark); text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: var(--transition); }
@@ -124,7 +133,7 @@
         .intro-section h2 { color: var(--primary-dark); font-size: 3rem; margin-bottom: 25px; }
         .intro-section p { color: #555; font-size: 1.1rem; line-height: 1.9; }
 
-        /* ABOUT & LICENSE (NUEVA SECCIÓN ESTILO GOLDEN CHARGE) */
+        /* ABOUT & LICENSE */
         .about-license { padding: 80px 0 100px; background: #fff; }
         .about-grid { display: flex; align-items: center; gap: 60px; flex-wrap: wrap; }
         .about-text { flex: 1; min-width: 300px; }
@@ -182,7 +191,7 @@
         .tech-card h3 { color: var(--primary-dark); font-size: 1.5rem; margin-bottom: 15px; font-family: 'Playfair Display', serif; }
         .tech-card p { color: #666; font-size: 0.95rem; line-height: 1.7; }
 
-        /* HAPPY CUSTOMERS (NUEVA SECCIÓN) */
+        /* HAPPY CUSTOMERS */
         .testimonials { padding: 100px 0; background: var(--bg-light); }
         .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 50px; }
         .testimo-card { background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; }
@@ -192,11 +201,11 @@
         .testimo-author { font-weight: 700; color: var(--primary-dark); }
         .testimo-loc { font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* GALLERY (CORREGIDA) */
+        /* GALLERY */
         .gallery { padding: 100px 0; background: #fff; }
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 50px; }
         .gallery-img { 
-            width: 100%; height: 320px; object-fit: cover; /* Esto evita que se deformen */
+            width: 100%; height: 320px; object-fit: cover; 
             border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: var(--transition); 
         }
         .gallery-img:hover { transform: scale(1.03); box-shadow: 0 15px 30px rgba(44, 76, 59, 0.15); }
@@ -228,7 +237,7 @@
         .footer-col i { margin-top: 5px; color: var(--accent-gold); }
         .footer-bottom { text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 25px; font-size: 0.9rem; color: #777; }
         
-        /* BOTONES FLOTANTES MÓVILES (Estilo Golden Charge) */
+        /* BOTONES FLOTANTES MÓVILES */
         .sticky-mobile-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(253, 251, 247, 0.95); backdrop-filter: blur(15px); box-shadow: 0 -5px 20px rgba(0,0,0,0.1); display: none; z-index: 9990; padding: 12px 20px; gap: 15px; border-top: 1px solid #eaeaea; }
         .sticky-btn { flex: 1; text-align: center; padding: 12px; border-radius: 50px; font-weight: 600; text-decoration: none; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .sticky-call { background: var(--primary-dark); color: #fff; }
@@ -243,7 +252,10 @@
             .trust-badge { bottom: -20px; left: 10px; width: 100px; height: 100px; font-size: 0.7rem; }
             .trust-badge i { font-size: 1.3rem; }
             .sticky-mobile-bar { display: flex; }
-            body { padding-bottom: 70px; } /* Espacio para la barra pegajosa */
+            body { padding-bottom: 70px; }
+            
+            #language-bar { padding: 8px 10px; }
+            #language-bar span { font-size: 0.75rem; }
         }
         @media (max-width: 480px) {
             .form-row { flex-direction: column; gap: 20px; }
@@ -254,7 +266,7 @@
 <body>
 
     <div id="language-bar">
-        <span style="font-weight: 600; color: var(--primary-dark);"><i class="fas fa-globe"></i> English, Español & 中文</span>
+        <span><i class="fas fa-globe"></i> English, Español & 中文</span>
         <div id="google_translate_element"></div>
     </div>
     
@@ -279,8 +291,8 @@
     <header>
         <div class="container header-content">
             <a href="#" class="logo">
-    <img src="https://pub-a9f35b2b86db4656b16e6e97d0d62544.r2.dev/svmassage/logo.png" alt="Scotts Valley Massage Logo" style="height: 65px; width: auto;">
-</a>
+                <img src="https://pub-a9f35b2b86db4656b16e6e97d0d62544.r2.dev/svmassage/logo.png" alt="Scotts Valley Massage Logo">
+            </a>
             <nav class="nav-menu">
                 <a href="#about">About Us</a>
                 <a href="#menu">Menu</a>
@@ -528,8 +540,13 @@
                     </select>
                     
                     <div class="form-row">
-                        <input type="date" name="Date" class="form-control" required title="Select Date">
-                        <input type="time" name="Time" class="form-control" min="10:00" max="22:00" required title="Select Time (10 AM - 10 PM)">
+                        <input type="text" name="Date" class="form-control" placeholder="Select Date" required 
+                               onfocus="(this.type='date')" 
+                               onblur="(this.value == '' ? this.type='text' : this.type='date')">
+                               
+                        <input type="text" name="Time" class="form-control" placeholder="Select Time" required 
+                               onfocus="(this.type='time')" 
+                               onblur="(this.value == '' ? this.type='text' : this.type='time')">
                     </div>
                     
                     <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 18px;">Request Appointment</button>
