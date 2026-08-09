@@ -522,13 +522,13 @@
         <div class="container">
             <div class="booking-wrapper" data-aos="zoom-in">
                 <h2>Book Your Session</h2>
-                <p>Fill out the form below and we will contact you to confirm your appointment, or call us directly at <strong>(831) 439-8888</strong>.</p>
+                <p>Select your preferred time below, or call us directly at <strong>(831) 439-8888</strong> to book your appointment.</p>
                 
-                <form action="https://submit-form.com/AaIXp9N6m" method="POST">
-                    <input type="text" name="Customer_Name" class="form-control" placeholder="Your Full Name" required>
-                    <input type="tel" name="Customer_Phone" class="form-control" placeholder="Phone Number" required>
+                <form id="spaBookingForm">
+                    <input type="text" id="customerName" class="form-control" placeholder="Your Full Name" required>
+                    <input type="tel" id="customerPhone" class="form-control" placeholder="Phone Number" required>
                     
-                    <select name="Treatment" class="form-control" required style="margin-bottom: 20px;">
+                    <select id="treatmentType" class="form-control" required style="margin-bottom: 20px;">
                         <option value="">Select Treatment...</option>
                         <option value="Deep Tissue Massage - 30 Min ($50)">Deep Tissue Massage - 30 Min ($50)</option>
                         <option value="Deep Tissue Massage - 60 Min ($70)">Deep Tissue Massage - 60 Min ($70)</option>
@@ -540,16 +540,17 @@
                     </select>
                     
                     <div class="form-row">
-                        <input type="text" name="Date" class="form-control" placeholder="Select Date" required 
-                               onfocus="(this.type='date')" 
-                               onblur="(this.value == '' ? this.type='text' : this.type='date')">
+                        <input type="date" id="bookingDate" class="form-control" required onchange="checkAvailability()">
                                
-                        <input type="text" name="Time" class="form-control" placeholder="Select Time" required 
-                               onfocus="(this.type='time')" 
-                               onblur="(this.value == '' ? this.type='text' : this.type='time')">
+                        <select id="bookingTime" class="form-control" required disabled>
+                            <option value="">First select a date...</option>
+                            <!-- JavaScript inyectará las horas aquí -->
+                        </select>
                     </div>
                     
-                    <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 18px;">Request Appointment</button>
+                    <button type="submit" id="submitBtn" class="btn" style="width: 100%; font-size: 1.1rem; padding: 18px;">Request Appointment</button>
+                    
+                    <div id="formMessage" style="text-align: center; margin-top: 20px; font-weight: 600; display: none;"></div>
                 </form>
             </div>
         </div>
