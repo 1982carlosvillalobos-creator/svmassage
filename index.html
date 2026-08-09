@@ -591,6 +591,121 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
       AOS.init({ duration: 800, once: true, offset: 100 });
+    </script> 
+
+    <!-- SISTEMA DINÁMICO DE RESERVAS (GOOGLE SHEETS) -->
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZQXDNUh5m7ZRN601ZfW5SsGOZ-FO7jeHWFqMjcjwQEU5LI83RUTGP5G-zq-YVn6B8Uw/exec';
+        let bookedAppointments = [];
+        
+        // Bloquear fechas anteriores a hoy
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('bookingDate').setAttribute('min', today);
+
+        // 1. Obtener las horas que ya están reservadas al cargar la página
+        fetch(GOOGLE_SCRIPT_URL)
+            .then(response => response.json())
+            .then(data => {
+                bookedAppointments = data;
+            })
+            .catch(error => console.error('Error fetching bookings:', error));
+
+        // 2. Revisar disponibilidad cuando el cliente elige un día
+        function checkAvailability() {
+            const selectedDate = document.getElementById('bookingDate').value;
+            const timeSelect = document.getElementById('bookingTime');
+            
+            if (!selectedDate) {
+                timeSelect.disabled = true;
+                timeSelect.innerHTML = '<option value="">First select a date...</option>';
+                return;
+            }
+
+            // Horarios de trabajo de 10:00 AM a 9:00 PM (Última cita 9 PM)
+            const allSlots = [
+                "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", 
+                "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"
+            ];
+            
+            // Buscar si hay horas ocupadas en la fecha que eligió el cliente
+            const occupiedSlots = bookedAppointments
+                .filter(app => app.date === selectedDate)
+                .map(app => app.time);
+
+            // Construir el menú desplegable con las horas
+            let optionsHtml = '<option value="">Select Time...</option>';
+            
+            allSlots.forEach(slot => {
+                let hour = parseInt(slot.split(':')[0]);
+                let ampm = hour >= 12 ? 'PM' : 'AM';
+                let displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+                let displayTime = `${displayHour}:00 ${ampm}`;
+                
+                // Si la hora ya está en Google Sheets, deshabilitarla
+                if (occupiedSlots.includes(slot)) {
+                    optionsHtml += `<option value="${slot}" disabled style="color: #999;">${displayTime} - Occupied</option>`;
+                } else {
+                    optionsHtml += `<option value="${slot}">${displayTime}</option>`;
+                }
+            });
+            
+            timeSelect.innerHTML = optionsHtml;
+            timeSelect.disabled = false;
+        }
+
+        // 3. Enviar los datos del cliente a Google Sheets al hacer clic en Reservar
+        document.getElementById('spaBookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const formMessage = document.getElementById('formMessage');
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+            
+            const payload = {
+                date: document.getElementById('bookingDate').value,
+                time: document.getElementById('bookingTime').value,
+                name: document.getElementById('customerName').value,
+                phone: document.getElementById('customerPhone').value,
+                treatment: document.getElementById('treatmentType').value,
+                source: "Website"
+            };
+            
+            // Enviar a la URL
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "Success") {
+                    // Actualizar el sistema localmente para que bloquee la hora de inmediato
+                    bookedAppointments.push({ date: payload.date, time: payload.time });
+                    
+                    // Mostrar mensaje de éxito
+                    formMessage.style.color = "var(--primary-light)";
+                    formMessage.innerText = "Appointment requested successfully! We will see you soon.";
+                    formMessage.style.display = "block";
+                    
+                    // Limpiar formulario
+                    document.getElementById('spaBookingForm').reset();
+                    checkAvailability();
+                    
+                    setTimeout(() => { formMessage.style.display = "none"; }, 6000);
+                }
+            })
+            .catch(error => {
+                formMessage.style.color = "red";
+                formMessage.innerText = "Error requesting appointment. Please call us.";
+                formMessage.style.display = "block";
+            })
+            .finally(() => {
+                submitBtn.innerHTML = 'Request Appointment';
+                submitBtn.disabled = false;
+            });
+        });
     </script>
 </body>
 </html>
