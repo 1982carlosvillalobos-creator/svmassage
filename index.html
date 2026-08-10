@@ -622,10 +622,15 @@
             }
 
             // Horarios de trabajo de 10:00 AM a 9:00 PM (Última cita 9 PM)
-            const allSlots = [
-                "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", 
-                "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"
-            ];
+            // Generar horarios cada 15 minutos (de 10:00 AM a 9:45 PM)
+const allSlots = [];
+for (let h = 10; h <= 21; h++) {
+    for (let m = 0; m < 60; m += 15) {
+        let hStr = h < 10 ? '0' + h : '' + h;
+        let mStr = m === 0 ? '00' : '' + m;
+        allSlots.push(`${hStr}:${mStr}`);
+    }
+}
             
             // Buscar si hay horas ocupadas en la fecha que eligió el cliente
             const occupiedSlots = bookedAppointments
