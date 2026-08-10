@@ -518,7 +518,7 @@
         </div>
     </section>
 
-    <!-- FORMULARIO CONECTADO A GOOGLE SHEETS -->
+    <!-- FORMULARIO DE RESERVA CONECTADO A GOOGLE SHEETS -->
     <section class="booking-section" id="booking">
         <div class="container">
             <div class="booking-wrapper" data-aos="zoom-in">
@@ -593,7 +593,7 @@
       AOS.init({ duration: 800, once: true, offset: 100 });
     </script>
 
-    <!-- SISTEMA DINÁMICO DE RESERVAS (CONEXIÓN A GOOGLE SHEETS EN INTERVALOS DE 15 MINUTOS) -->
+    <!-- SISTEMA DINÁMICO DE RESERVAS (CON DURACIÓN Y 15 MIN DE LIMPIEZA) -->
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZQXDNUh5m7ZRN601ZfW5SsGOZ-FO7jeHWFqMjcjwQEU5LI83RUTGP5G-zq-YVn6B8Uw/exec';
         let bookedAppointments = [];
@@ -610,6 +610,24 @@
             })
             .catch(error => console.error('Error fetching bookings:', error));
 
+        // Extraer la duración en minutos del nombre del tratamiento
+        function getDurationInMinutes(treatmentStr) {
+            if (!treatmentStr) return 60;
+            if (treatmentStr.includes("30 Min")) return 30;
+            if (treatmentStr.includes("90 Min")) return 90;
+            if (treatmentStr.includes("60 Min")) return 60;
+            return 60;
+        }
+
+        // Convertir hora "18:00" a minutos totales (18 * 60 = 1080)
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return 0;
+            const parts = timeStr.split(':');
+            const h = parseInt(parts[0], 10);
+            const m = parseInt(parts[1], 10);
+            return h * 60 + m;
+        }
+
         // 2. Revisar disponibilidad cuando el cliente elige un día
         function checkAvailability() {
             const selectedDate = document.getElementById('bookingDate').value;
@@ -621,7 +639,7 @@
                 return;
             }
 
-            // Generar horarios cada 15 minutos (de 10:00 AM a 9:45 PM)
+            // Horarios de trabajo de 10:00 AM a 9:45 PM (intervalos de 15 minutos)
             const allSlots = [];
             for (let h = 10; h <= 21; h++) {
                 for (let m = 0; m < 60; m += 15) {
@@ -631,22 +649,31 @@
                 }
             }
             
-            // Buscar si hay horas ocupadas en la fecha que eligió el cliente
-            const occupiedSlots = bookedAppointments
+            // Calcular los bloques de tiempo ocupados (Duración del masaje + 15 min de limpieza)
+            const occupiedWindows = bookedAppointments
                 .filter(app => app.date === selectedDate)
-                .map(app => app.time);
+                .map(app => {
+                    const startMin = timeToMinutes(app.time);
+                    const duration = getDurationInMinutes(app.treatment);
+                    const endMin = startMin + duration + 15; // Duración + 15 min limpieza
+                    return { start: startMin, end: endMin };
+                });
 
-            // Construir el menú desplegable con las horas
             let optionsHtml = '<option value="">Select Time...</option>';
             
             allSlots.forEach(slot => {
+                const slotMin = timeToMinutes(slot);
+                
+                // Si la hora cae dentro de un intervalo ocupado, se deshabilita
+                const isOccupied = occupiedWindows.some(w => slotMin >= w.start && slotMin < w.end);
+                
                 let [hStr, mStr] = slot.split(':');
-                let hour = parseInt(hStr);
+                let hour = parseInt(hStr, 10);
                 let ampm = hour >= 12 ? 'PM' : 'AM';
                 let displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
                 let displayTime = `${displayHour}:${mStr} ${ampm}`;
                 
-                if (occupiedSlots.includes(slot)) {
+                if (isOccupied) {
                     optionsHtml += `<option value="${slot}" disabled style="color: #999;">${displayTime} - Occupied</option>`;
                 } else {
                     optionsHtml += `<option value="${slot}">${displayTime}</option>`;
@@ -684,7 +711,11 @@
             .then(response => response.json())
             .then(data => {
                 if(data.status === "Success") {
-                    bookedAppointments.push({ date: payload.date, time: payload.time });
+                    bookedAppointments.push({ 
+                        date: payload.date, 
+                        time: payload.time, 
+                        treatment: payload.treatment 
+                    });
                     
                     formMessage.style.color = "var(--primary-light)";
                     formMessage.innerText = "Appointment requested successfully! We will see you soon.";
