@@ -593,7 +593,7 @@
       AOS.init({ duration: 800, once: true, offset: 100 });
     </script>
 
-    <!-- SISTEMA DINÁMICO DE RESERVAS (CON DURACIÓN, LIMPIEZA Y PARSEO FLEXIBLE DE HORAS) -->
+    <!-- SISTEMA DINÁMICO DE RESERVAS MEJORADO -->
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZQXDNUh5m7ZRN601ZfW5SsGOZ-FO7jeHWFqMjcjwQEU5LI83RUTGP5G-zq-YVn6B8Uw/exec';
         let bookedAppointments = [];
@@ -610,12 +610,15 @@
             })
             .catch(error => console.error('Error fetching bookings:', error));
 
-        // Extraer la duración en minutos del nombre del tratamiento
+        // Detectar de forma flexible 90, 30 o 60 minutos
         function getDurationInMinutes(treatmentStr) {
             if (!treatmentStr) return 60;
-            if (treatmentStr.includes("30 Min")) return 30;
-            if (treatmentStr.includes("90 Min")) return 90;
-            if (treatmentStr.includes("60 Min")) return 60;
+            const str = treatmentStr.toString();
+            
+            if (str.includes("90")) return 90;
+            if (str.includes("30")) return 30;
+            if (str.includes("60")) return 60;
+            
             return 60;
         }
 
@@ -627,7 +630,6 @@
             const isPM = str.includes('PM');
             const isAM = str.includes('AM');
             
-            // Limpiar texto y dejar solo números y dos puntos
             str = str.replace(/[^0-9:]/g, '');
             const parts = str.split(':');
             if (parts.length < 2) return 0;
@@ -635,7 +637,6 @@
             let h = parseInt(parts[0], 10) || 0;
             let m = parseInt(parts[1], 10) || 0;
             
-            // Convertir formato 12 horas (AM/PM) a 24 horas
             if (isPM && h < 12) h += 12;
             if (isAM && h === 12) h = 0;
             
