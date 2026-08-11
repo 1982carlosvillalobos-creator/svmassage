@@ -593,7 +593,7 @@
       AOS.init({ duration: 800, once: true, offset: 100 });
     </script>
 
-    <!-- SISTEMA DINÁMICO DE RESERVAS (CON DURACIÓN Y 15 MIN DE LIMPIEZA) -->
+    <!-- SISTEMA DINÁMICO DE RESERVAS (CON DURACIÓN, LIMPIEZA Y PARSEO FLEXIBLE DE HORAS) -->
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZQXDNUh5m7ZRN601ZfW5SsGOZ-FO7jeHWFqMjcjwQEU5LI83RUTGP5G-zq-YVn6B8Uw/exec';
         let bookedAppointments = [];
@@ -619,12 +619,26 @@
             return 60;
         }
 
-        // Convertir hora "18:00" a minutos totales (18 * 60 = 1080)
+        // Convertir cualquier formato de hora ("16:15", "04:15 PM", "9:30") a minutos totales
         function timeToMinutes(timeStr) {
             if (!timeStr) return 0;
-            const parts = timeStr.split(':');
-            const h = parseInt(parts[0], 10);
-            const m = parseInt(parts[1], 10);
+            
+            let str = timeStr.toString().trim().toUpperCase();
+            const isPM = str.includes('PM');
+            const isAM = str.includes('AM');
+            
+            // Limpiar texto y dejar solo números y dos puntos
+            str = str.replace(/[^0-9:]/g, '');
+            const parts = str.split(':');
+            if (parts.length < 2) return 0;
+            
+            let h = parseInt(parts[0], 10) || 0;
+            let m = parseInt(parts[1], 10) || 0;
+            
+            // Convertir formato 12 horas (AM/PM) a 24 horas
+            if (isPM && h < 12) h += 12;
+            if (isAM && h === 12) h = 0;
+            
             return h * 60 + m;
         }
 
